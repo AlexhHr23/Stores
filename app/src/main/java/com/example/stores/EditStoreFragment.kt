@@ -1,7 +1,9 @@
 package com.example.stores
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.google.android.material.snackbar.Snackbar
@@ -51,10 +53,14 @@ class EditStoreFragment : Fragment() {
                 doAsync {
                     StoreApplication.database.storeDao().addStore(store)
                     uiThread {
+                        hideKeyboard()
+
                         Snackbar.make(mBiding.root,
                             getString(R.string.edit_store_message_save_success),
                             Snackbar.LENGTH_SHORT)
                             .show()
+
+                        mActivity?.onBackPressed()
                     }
                 }
 
@@ -62,6 +68,18 @@ class EditStoreFragment : Fragment() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun hideKeyboard(){
+        val imm = mActivity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (view != null){
+            imm.hideSoftInputFromWindow(view!!.windowToken, 0)
+        }
+    }
+
+    override fun onDestroyView() {
+        hideKeyboard()
+        super.onDestroyView()
     }
 
     override fun onDestroy() {
