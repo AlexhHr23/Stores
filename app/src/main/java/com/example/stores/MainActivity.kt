@@ -7,9 +7,9 @@ import com.example.stores.databinding.ActivityMainBinding
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-class MainActivity : AppCompatActivity(), OnClickListener,MainAux{
+class MainActivity : AppCompatActivity(), OnClickListener, MainAux {
 
-    private lateinit var mBinding : ActivityMainBinding
+    private lateinit var mBinding: ActivityMainBinding
 
     private lateinit var mAdapter: StoreAdapter
     private lateinit var mGridLayout: GridLayoutManager
@@ -21,8 +21,9 @@ class MainActivity : AppCompatActivity(), OnClickListener,MainAux{
 
         /*mBinding.btnSave.setOnClickListener {
             val store = StoreEntity(name = mBinding.etName.text.toString().trim())
+
             Thread {
-            StoreApplication.database.storeDao().addStore(store)
+                StoreApplication.database.storeDao().addStore(store)
             }.start()
 
             mAdapter.add(store)
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity(), OnClickListener,MainAux{
 
         mBinding.fab.setOnClickListener { launchEditFragment() }
 
-        setupRecyclerView()
+        setupRecylcerView()
     }
 
     private fun launchEditFragment() {
@@ -43,13 +44,10 @@ class MainActivity : AppCompatActivity(), OnClickListener,MainAux{
         fragmentTransaction.addToBackStack(null)
         fragmentTransaction.commit()
 
-        //mBinding.fab.hide()
-
-        hideFab()
-
+        mBinding.fab.hide()
     }
 
-    private fun setupRecyclerView() {
+    private fun setupRecylcerView() {
         mAdapter = StoreAdapter(mutableListOf(), this)
         mGridLayout = GridLayoutManager(this, 2)
         getStores()
@@ -68,13 +66,12 @@ class MainActivity : AppCompatActivity(), OnClickListener,MainAux{
                 mAdapter.setStores(stores)
             }
         }
-
-
     }
 
-    //OnClickListener
+    /*
+    * OnClickListener
+     */
     override fun onClick(storeEntity: StoreEntity) {
-
     }
 
     override fun onFavoriteStore(storeEntity: StoreEntity) {
@@ -93,12 +90,15 @@ class MainActivity : AppCompatActivity(), OnClickListener,MainAux{
             uiThread {
                 mAdapter.delete(storeEntity)
             }
+
         }
     }
 
-    //MainAux
+    /*
+    *MainAux
+    * */
     override fun hideFab(isVisible: Boolean) {
-        if (isVisible) mBinding.fab.show() else mBinding.fab.hide()
+        if (isVisible)mBinding.fab.show() else mBinding.fab.hide()
     }
 
     override fun addStore(storeEntity: StoreEntity) {

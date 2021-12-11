@@ -2,14 +2,12 @@ package com.example.stores
 
 import androidx.room.*
 
-
 @Dao
 interface StoreDao {
-    @Query("SELECT * FROM storeEntity")
+    @Query( "SELECT * FROM StoreEntity")
     fun getAllStores() : MutableList<StoreEntity>
 
     @Insert
-
     fun addStore(storeEntity: StoreEntity) : Long
 
     @Update

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.stores.databinding.ItemStoreBinding
 
 class StoreAdapter(private var stores: MutableList<StoreEntity>, private var listener: OnClickListener) :
-    RecyclerView.Adapter<StoreAdapter.ViewHolder>(){
+    RecyclerView.Adapter<StoreAdapter.ViewHolder>() {
 
     private lateinit var mContext: Context
 
@@ -20,7 +20,7 @@ class StoreAdapter(private var stores: MutableList<StoreEntity>, private var lis
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int){
         val store = stores.get(position)
 
         with(holder){
@@ -61,21 +61,23 @@ class StoreAdapter(private var stores: MutableList<StoreEntity>, private var lis
         }
     }
 
+
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
-        val binding = ItemStoreBinding.bind((view))
+        val binding = ItemStoreBinding.bind(view)
 
         fun setListener(storeEntity: StoreEntity){
-            with(binding.root){
-              setOnClickListener { listener.onClick(storeEntity) }
-              setOnLongClickListener {
-                listener.onDeleteStore(storeEntity)
-                true
-              }
+            with(binding.root) {
+                setOnClickListener { listener.onClick(storeEntity) }
+                setOnLongClickListener {
+                    listener.onDeleteStore(storeEntity)
+                    true
+                }
             }
 
-            binding.cbFavorite.setOnClickListener {
-                listener.onFavoriteStore(storeEntity)
+                binding.cbFavorite.setOnClickListener{
+                    listener.onFavoriteStore(storeEntity)
+                }
             }
+
         }
     }
-}

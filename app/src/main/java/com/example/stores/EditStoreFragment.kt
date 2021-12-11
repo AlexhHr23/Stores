@@ -4,23 +4,26 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.stores.databinding.FragmentEditStoreBinding
 import com.google.android.material.snackbar.Snackbar
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
-
 class EditStoreFragment : Fragment() {
 
-    private lateinit var mBiding: FragmentEditStoreBinding
+    private lateinit var mBinding: FragmentEditStoreBinding
     private var mActivity: MainActivity? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle? ): View? {
-        mBiding = FragmentEditStoreBinding.inflate(inflater, container, false)
+        mBinding = FragmentEditStoreBinding.inflate(inflater, container, false)
 
-        return mBiding.root
+        return mBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -31,6 +34,14 @@ class EditStoreFragment : Fragment() {
         mActivity?.supportActionBar?.title = getString(R.string.edit_store_title_add)
 
         setHasOptionsMenu(true)
+
+        mBinding.etPhotoUrl.addTextChangedListener {
+            Glide.with(this)
+                .load(mBinding.etPhotoUrl.text.toString())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .into(mBinding.imgPhoto)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -45,10 +56,9 @@ class EditStoreFragment : Fragment() {
                 true
             }
             R.id.action_save -> {
-
-                val store = StoreEntity(name = mBiding.etName.text.toString().trim(),
-                    phone = mBiding.etPhone.text.toString().trim(),
-                    website = mBiding.etWebsite.text.toString().trim())
+                val store = StoreEntity(name = mBinding.etName.text.toString().trim(),
+                phone = mBinding.etPhone.text.toString().trim(),
+                website = mBinding.etWebsite.text.toString().trim())
 
                 doAsync {
                     store.id = StoreApplication.database.storeDao().addStore(store)
@@ -57,15 +67,15 @@ class EditStoreFragment : Fragment() {
 
                         hideKeyboard()
 
-                        Snackbar.make(mBiding.root,
-                            getString(R.string.edit_store_message_save_success),
-                            Snackbar.LENGTH_SHORT)
-                            .show()
+//                        Snackbar.make(mBinding.root,
+//                            getString(R.string.edit_store_message_save_sucess),
+//                            Snackbar.LENGTH_SHORT)
+//                            .show()
+                        Toast.makeText(mActivity, R.string.edit_store_message_save_sucess, Toast.LENGTH_SHORT).show()
 
                         mActivity?.onBackPressed()
                     }
                 }
-
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -92,5 +102,4 @@ class EditStoreFragment : Fragment() {
         setHasOptionsMenu(false)
         super.onDestroy()
     }
-
 }
