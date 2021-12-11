@@ -18,6 +18,8 @@ class EditStoreFragment : Fragment() {
 
     private lateinit var mBinding: FragmentEditStoreBinding
     private var mActivity: MainActivity? = null
+    private var mIsEditMode: Boolean = false
+    private var mStoreEntity: StoreEntity? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle? ): View? {
@@ -28,6 +30,14 @@ class EditStoreFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val id = arguments?.getLong(getString(R.string.arg_id), 0)
+        if (id != null && id != 0L){
+            mIsEditMode = true
+            getStore(id)
+        }else{
+            Toast.makeText(activity, id.toString(), Toast.LENGTH_SHORT).show()
+        }
 
         mActivity = activity as? MainActivity
         mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -41,6 +51,13 @@ class EditStoreFragment : Fragment() {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .centerCrop()
                 .into(mBinding.imgPhoto)
+        }
+    }
+
+    private fun getStore(id: Long) {
+        doAsync {
+            mStoreEntity = StoreApplication.database.storeDao().getStoreById(id)
+            uiThread {  }
         }
     }
 
@@ -58,7 +75,8 @@ class EditStoreFragment : Fragment() {
             R.id.action_save -> {
                 val store = StoreEntity(name = mBinding.etName.text.toString().trim(),
                 phone = mBinding.etPhone.text.toString().trim(),
-                website = mBinding.etWebsite.text.toString().trim())
+                website = mBinding.etWebsite.text.toString().trim(),
+                photoUrl = mBinding.etPhotoUrl.text.toString().trim())
 
                 doAsync {
                     store.id = StoreApplication.database.storeDao().addStore(store)
