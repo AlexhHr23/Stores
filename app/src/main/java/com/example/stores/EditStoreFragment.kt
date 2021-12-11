@@ -80,74 +80,109 @@ class EditStoreFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId){
+        return when (item.itemId) {
             android.R.id.home -> {
                 mActivity?.onBackPressed()
                 true
             }
             R.id.action_save -> {
 
-                if(mStoreEntity != null){
+                if(mStoreEntity != null && validateFields()){
 //                val store = StoreEntity(name = mBinding.etName.text.toString().trim(),
 //                phone = mBinding.etPhone.text.toString().trim(),
 //                website = mBinding.etWebsite.text.toString().trim(),
 //                photoUrl = mBinding.etPhotoUrl.text.toString().trim())
-                    with(mStoreEntity!!){
+                    with(mStoreEntity!!) {
                         name = mBinding.etName.text.toString().trim()
                         phone = mBinding.etPhone.text.toString().trim()
                         website = mBinding.etWebsite.text.toString().trim()
                         photoUrl = mBinding.etPhotoUrl.text.toString().trim()
                     }
 
-                doAsync {
+                    doAsync {
 
-                    if (mIsEditMode) StoreApplication.database.storeDao().updateStore(mStoreEntity!!)
-                    else mStoreEntity!!.id = StoreApplication.database.storeDao().addStore(mStoreEntity!!)
+                        if (mIsEditMode) StoreApplication.database.storeDao()
+                            .updateStore(mStoreEntity!!)
+                        else mStoreEntity!!.id =
+                            StoreApplication.database.storeDao().addStore(mStoreEntity!!)
 
-                    uiThread {
-                        if (mIsEditMode){
-                            mActivity?.updateStore(mStoreEntity!!)
+                        uiThread {
+                            if (mIsEditMode) {
+                                mActivity?.updateStore(mStoreEntity!!)
 
-                            Snackbar.make(mBinding.root,
-                                R.string.edit_store_message_save_sucess,
-                                Snackbar.LENGTH_SHORT).show()
-                        } else {
-                            mActivity?.addStore(mStoreEntity!!)
+                                Snackbar.make(
+                                    mBinding.root,
+                                    R.string.edit_store_message_save_sucess,
+                                    Snackbar.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                mActivity?.addStore(mStoreEntity!!)
 
-                            Toast.makeText(
-                                mActivity,
-                                R.string.edit_store_message_save_sucess,
-                                Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    mActivity,
+                                    R.string.edit_store_message_save_sucess,
+                                    Toast.LENGTH_SHORT
+                                ).show()
 
-                            mActivity?.onBackPressed()
+                                mActivity?.onBackPressed()
+                            }
+
                         }
-
                     }
+                    true
                 }
-                true
+                else -> super.onOptionsItemSelected(item)
             }
-            else -> super.onOptionsItemSelected(item)
+        }
+
+        private fun validateFields(): Boolean {
+            var isValid = true
+
+            if (mBinding.etPhotoUrl.text.toString().trim().isEmpty()){
+                mBinding.tilPhoneUrl.error = getString(R.string.helper_required)
+                mBinding.etPhotoUrl.requestFocus()
+                isValid = false
+
+            }
+
+            if (mBinding.etPhone.text.toString().trim().isEmpty()){
+                mBinding.tilPhone.error = getString(R.string.helper_required)
+                mBinding.etPhone.requestFocus()
+                isValid = false
+
+            }
+
+            if (mBinding.etName.text.toString().trim().isEmpty()){
+                mBinding.tilName.error = getString(R.string.helper_required)
+                mBinding.etName.requestFocus()
+                isValid = false
+
+            }
+
+            return isValid
+        }
+        if(mStoreEntity != null && validateFields()){
+
+        private fun hideKeyboard() {
+            val imm =
+                mActivity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            if (view != null) {
+                imm.hideSoftInputFromWindow(view!!.windowToken, 0)
+            }
+        }
+
+        override fun onDestroyView() {
+            hideKeyboard()
+            super.onDestroyView()
+        }
+
+        override fun onDestroy() {
+            mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
+            mActivity?.supportActionBar?.title = getString(R.string.app_name)
+            mActivity?.hideFab(true)
+
+            setHasOptionsMenu(false)
+            super.onDestroy()
         }
     }
-
-    private fun hideKeyboard(){
-        val imm = mActivity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (view != null){
-            imm.hideSoftInputFromWindow(view!!.windowToken, 0)
-        }
     }
-
-    override fun onDestroyView() {
-        hideKeyboard()
-        super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        mActivity?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        mActivity?.supportActionBar?.title = getString(R.string.app_name)
-        mActivity?.hideFab(true)
-
-        setHasOptionsMenu(false)
-        super.onDestroy()
-    }
-}
